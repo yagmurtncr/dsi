@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+logs/
+*.log
+
+# Cache
+.cache/
+.pytest_cache/
+.mypy_cache/
+
+# Model files (large - don't commit)
+models/
+*.pth
+*.bin
+*.safetensors
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+nohup.out
+
+# Environment & Secrets
+.env
+.env.local
+secrets/
+
+# SSL Certificates
+certs/*.pem
+certs/*.key
+src/security/ssl/*.pem
+src/security/ssl/*.key
+
+# Client Keys
+client_keys/

@@ -1,0 +1,18 @@
+# MDI-LLM API - Gerekli Paketler
+
+# FastAPI ve Server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# LLM ve Model
+torch>=2.0.0
+transformers>=4.35.0
+accelerate>=0.24.0
+
+# Security
+bcrypt==4.1.1
+cryptography==41.0.7
+
+# Utilities
+requests>=2.31.0
