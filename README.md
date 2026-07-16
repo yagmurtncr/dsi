@@ -26,47 +26,23 @@ Model katmanları 3 farklı node'a bölünmüş, güvenli LLM sistemi. Hiçbir n
 
 ## 🏗️ Mimari
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              👤 CLIENT                                      │
-│                         (Swagger UI / cURL / SDK)                           │
-└─────────────────────────────────┬───────────────────────────────────────────┘
-                                  │
-                                  │ HTTPS/TLS 1.3 + JWT Token
-                                  │
-                                  ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        🔒 API SERVER (Port 9000)                            │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
-│  │ JWT Auth    │ │ Rate Limit  │ │ Input Valid │ │ RBAC        │           │
-│  │ (60 dk)     │ │ (20/dk)     │ │ (XSS/SQLi)  │ │ (Roller)    │           │
-│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘           │
-│  ┌─────────────────────────────────────────────────────────────┐           │
-│  │              🔐 Response Encryption (AES-256-GCM)           │           │
-│  └─────────────────────────────────────────────────────────────┘           │
-└─────────────────────────────────┬───────────────────────────────────────────┘
-                                  │
-                 ┌────────────────┼────────────────┐
-                 │                │                │
-                 ▼                ▼                ▼
-┌────────────────────┐  ┌─────────────────────────────────────────────────────┐
-│  🛡️ PII NODE       │  │              🧠 DISTRIBUTED LLM                     │
-│  Port: 7000        │  │                                                     │
-│  ┌──────────────┐  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │
-│  │ Turkish NER  │  │  │  │  NODE 1     │  │  NODE 2     │  │  NODE 3     │ │
-│  │ Model        │  │  │  │  Port:8001  │  │  Port:8002  │  │  Port:8003  │ │
-│  └──────────────┘  │  │  │  GPU: ~10GB │  │  GPU: ~9GB  │  │  GPU: ~10GB │ │
-│  ┌──────────────┐  │  │  ├─────────────┤  ├─────────────┤  ├─────────────┤ │
-│  │ Regex        │  │  │  │ • Tokenizer │  │             │  │             │ │
-│  │ (TC/Tel/     │  │  │  │ • Embedding │  │ • Layer     │  │ • Layer     │ │
-│  │  Email/IBAN) │  │  │  │ • Layer 0-10│─▶│   11-21     │─▶│   22-31     │ │
-│  └──────────────┘  │  │  │             │  │             │  │ • LM Head   │ │
-│                    │  │  └─────────────┘  └─────────────┘  └─────────────┘ │
-│  • Maskeleme       │  │         │                │                │        │
-│  • Unmasking       │  │         └────────────────┴────────────────┘        │
-└────────────────────┘  │                    🔐 RSA+AES                       │
-                        │              (Node↔Node Encrypted)                  │
-                        └─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    Client["👤 Client<br/>(Swagger / cURL / SDK)"] -->|"HTTPS/TLS 1.3 + JWT"| API
+
+    subgraph API["🔒 API Server (:9000)"]
+        direction LR
+        AUTH["JWT Auth"] --> RL["Rate limit (20/dk)"] --> IV["Input validation<br/>(XSS / SQLi)"] --> RBAC["RBAC"]
+        ENC["🔐 Response encryption<br/>(AES-256-GCM)"]
+    end
+
+    API --> PII["🛡️ PII Node (:7000)<br/>Turkish NER + regex<br/>(TC / tel / e-posta / IBAN)<br/>mask · unmask"]
+    API --> LLM
+
+    subgraph LLM["🧠 Distributed LLM · RSA+AES between nodes"]
+        direction LR
+        N1["Node 1 (:8001)<br/>tokenizer · embedding<br/>layers 0–10"] --> N2["Node 2 (:8002)<br/>layers 11–21"] --> N3["Node 3 (:8003)<br/>layers 22–31 · LM head"]
+    end
 ```
 
 ## 🔐 Güvenlik

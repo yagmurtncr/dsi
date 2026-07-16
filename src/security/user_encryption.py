@@ -215,7 +215,7 @@ if __name__ == "__main__":
     
     # Test 1: Admin kullanıcısı
     print("1️⃣  Admin kullanıcısı test")
-    admin_password = "admin_secret_password"
+    admin_password = os.getenv("DEMO_ADMIN_PW", "demo-admin-pw")  # demo-only (self-test below)
     admin_data = "Hasta: Ahmet Yılmaz (TC: 12345678901)"
     
     encrypted_admin = user_enc.encrypt_data(admin_data, "admin", admin_password)
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     
     # Test 2: Pilot1 kullanıcısı (farklı key)
     print("2️⃣  Pilot1 kullanıcısı test")
-    pilot1_password = "pilot1_secret_password"
+    pilot1_password = os.getenv("DEMO_PILOT1_PW", "demo-pilot1-pw")  # demo-only
     pilot1_data = "Hasta: Ayşe Kara (TC: 98765432109)"
     
     encrypted_pilot1 = user_enc.encrypt_data(pilot1_data, "pilot1", pilot1_password)
